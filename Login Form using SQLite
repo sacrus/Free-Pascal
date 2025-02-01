@@ -1,0 +1,107 @@
+{
+Login Form using SQLite
+
+Needed:
+- Form with 2 text fields (user and password) and at least 1 button
+- sqlite3.dll (Download last version from oficial SQLite website: https://www.sqlite.org/download.html )
+- SQLdb -> TSQLite3Connection, TSQLQuery, TSQLTransaction
+- TSQLite3Connection -> Connected = True; Keepconnection = True; DatabaseName = [Path/NameofDB.db]; Transaction = TSQLTransaction
+- TSQLQuery -> Database = TSQLite3Connection; Transaction = TSQLTransaction
+- TSQLTransaction -> Database = TSQLite3Connection
+
+Save Project, and put sqlite3.dll inside folder.
+}
+
+
+unit loginfrm;
+
+{$mode objfpc}{$H+}
+
+interface
+
+uses
+  Classes, SysUtils, SQLite3Conn, SQLDB, Forms, Controls, Graphics, Dialogs,
+  StdCtrls;
+
+type
+
+  { TForm1 }
+
+  TForm1 = class(TForm)
+    exit: TButton;
+    enter: TButton;
+    lbluser: TEdit;
+    lblpassword: TEdit;
+    Label1: TLabel;
+    Label2: TLabel;
+    conn: TSQLite3Connection;
+    SQLQ: TSQLQuery;
+    SQLT: TSQLTransaction;
+    procedure enterClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure exitClick(Sender: TObject);
+  private
+
+  public
+
+  end;
+
+var
+  Form1: TForm1;
+
+implementation
+
+{$R *.lfm}
+
+{ TForm1 }
+
+procedure TForm1.FormCreate(Sender: TObject);
+begin
+
+end;
+
+{Procedure when click Enter button}
+
+procedure TForm1.enterClick(Sender: TObject);
+{ Variables needed }
+var
+  Utilizador, Pass: String;
+
+begin
+ {Add the text into variables}
+ User:= QuotedStr(lbluser.Text);
+ Pass:= QuotedStr(lblpassword.text);
+ {Close and clear any query usage}
+ SQLQ.Close;
+ SQLQ.SQL.Clear;
+ {Insert SQL command into query}
+ SQLQ.SQL.Add('Select Login,Password from Login where Login= ' + User + 'and Password=' + Pass + '');
+ SQLT.Active:= True;
+ SQLQ.Open;
+{if query return no results:}
+ if (SQLQ.EOF) then
+ begin
+{ show a message or another routine }
+   ShowMessage('Wrong Username or password');
+ {Close and clear any query usage}
+   SQLT.Active:= False;
+   SQLQ.Close;
+   SQLQ.SQL.Clear;
+{Clear variables data}
+   User:= '';
+   Pass:= '';
+ end
+{ if query return results: }
+ else
+ begin
+{ show a message or another routine }
+   ShowMessage('Login com sucesso!');
+ end
+end;
+
+{ This button to close the program is not necessary. It's only for design purposes or call exit routine }
+procedure TForm1.exitClick(Sender: TObject);
+begin
+ close;
+end;
+end.
